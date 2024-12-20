@@ -1,0 +1,679 @@
+html, body {
+    background-color: #f3f3f3; 
+    height: 100vh;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    overflow-y: scroll;
+    font-family: 'Arial', sans-serif;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the wrapper take the full height of the viewport */
+}
+
+.content {
+    flex: 1; /* makes the content area grow and fill the remaining space */
+}
+
+.userdashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+}
+
+.userdashboard-container {
+    display: flex;              
+    flex-direction: column;      
+    justify-content: center;     
+    align-items: center;         
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    width: 300px;
+    height: 300px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #000000;
+    margin-bottom: 15px;
+    margin-top: 25px;
+}
+
+.user-info {
+    text-align: center;
+    margin: 0;  
+    padding: 0;
+}
+
+.user-info h2 {
+    font-size: 23px;
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+.user-role {
+    font-size: 18px;
+    margin: 0;
+}
+
+.joined-date {
+    margin-top: -5px; 
+    font-size: 15px;
+    color: gray;  
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background-color: white;
+}
+
+.logo {
+    width: 150px; 
+    height: 120px;
+}
+
+
+/* ------ ALL BUTTONS ------ */
+.btn-primary {
+    background-color: #17a2b8; 
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #138496; 
+}
+
+.btn-deleteProperty {
+    background-color: #dc1f2b;
+    color: white;
+    text-align: center;
+    width: auto;
+}
+
+.btn-viewDetails {
+    background-color: #31c0c0 !important;
+    border: none;
+    width: auto;
+    padding: 10px 20px; 
+}
+
+.btn-update {
+    background-color: #30BFBF;
+    color: white;
+    border: none;
+    width: auto;
+}
+
+.btn-update:hover, .btn-viewDetails:hover {
+    background-color: #366b6b; 
+    color: white;
+}
+
+.btn-next, .btn-prev, .btn-submit {
+    background-color: #31c0c0;  
+    border: none; 
+    color: white; 
+    padding: 10px 20px; 
+    border-radius: 8px;
+    width: 30%;  
+}
+
+.btn-applyfilter {
+    background-color: #5fbfe2 !important;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+}
+
+.btn-applyfilter:hover {
+    background-color: #93c8df !important;
+}
+
+.save-property-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    padding: 0;
+}
+
+.btn-whatsapp {
+    background-color: #2dc796 !important;
+    color: white;
+    width: 100%;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.btn-whatsapp:hover {
+    background-color: #248969;
+}
+
+.FormUpdateButton {
+    background-color: #30BFBF;
+    color: white;
+    border: none;
+    width: auto;
+}
+.search-btn {
+    background-color: #30BFBF; 
+    color: white; 
+    border: none; 
+}
+.search-btn:hover {
+    background-color: #000; 
+    color: white; 
+}
+
+
+/* ------ NAVIGATION BAR ------ */
+.navbar-nav .nav-item {
+    margin-right: 20px;
+}
+.navbar {
+    padding: 1rem;
+}
+.nav-link {
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+.nav-link:hover {
+    color: #30BFBF !important;
+    text-decoration: none;
+}
+
+
+/* ------ LOGIN PHP ------ */
+.login-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.login-container h2 {
+    font-size: 28px;
+    color: #1a1a1a;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+.login-container p {
+    margin-bottom: 20px;
+    color: #666;
+}
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.login-container input {
+    padding: 15px;  
+    border: 1px solid #000000;
+    border-radius: 15px;
+    font-size: 16px;
+}
+.forgot-password {
+    font-size: 16px;
+    color: #17a2b8;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+
+/* ------ REGISTER PHP ------ */
+.register-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.nav-tabs .nav-link {
+    border-radius: 5px;
+    color: #495057;
+}
+.nav-tabs .nav-link.active {
+    background-color: #31c0c0;
+    color: #fff;
+    border: none;
+}
+.form-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.form-control,
+.btn {
+    margin-bottom: 15px; 
+}
+label {
+    font-weight: bold; 
+}
+
+
+/* ------ FORGOT PASSWORD PHP ------ */
+.reset-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.text-center h2 {
+    font-weight: 600; 
+    margin-bottom: 20px; 
+}
+.form-control {
+    border-radius: 5px; 
+}
+
+/* ------ DASHBOARD PHP ------ */
+.welcome {
+    text-align: center;
+    padding: 20px;
+    background-color:#72eaea;
+}
+.bg-light-red {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ------ SAVED PROPERTY PHP ------ */
+.property-actions form {
+    margin-top: 10px; 
+}
+.property-card {
+    display: flex;
+    flex-direction: column;
+}
+.property-actions {
+    margin-top: auto; 
+}
+
+
+/* ------ NOTIFICATION PHP ------ */
+.notification-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: none;
+}
+.notification-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+.notification-header .badge {
+    font-size: 0.85rem;
+}
+.notification-body {
+    padding: 15px;
+}
+.notification-footer {
+    background-color: #f9f9f9;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.btn-mark-read {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+
+/* ------ HOMEOWNER AND STUDENT PROFILE PHP ------ */
+.profile-header {
+    background-color: white;
+   
+    border: 1px solid #e0e0e0;
+}
+.count-container {
+    display: flex; 
+    align-items: center;
+    gap: 5px; 
+}
+.count-number {
+    font-size: 17px;
+    font-weight: bold;
+    margin: 0;
+}
+.count-label {
+    font-size: 15px;
+    margin: 0;
+    color: #6c757d; 
+}
+
+
+/* ------ ADD PROPERTY PHP ------ */
+.form-header {
+    background-color: #1A1A40;
+    color: white;
+    padding: 15px;
+    border-radius: 5px 5px 0 0;
+}
+.form-header h5 {
+    font-weight: bold;
+    font-size: 25px;
+}
+.card {
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.drag-drop {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+.section {
+    background-color: #1A1A40; 
+    color: white; 
+    font-weight: bold; 
+    padding: 10px; 
+    border-radius: 5px;
+}
+
+
+/* ------ PROPERTY CARD PHP ------ */
+.property-card {
+    width: 400px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+.property-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.property-info {
+    padding: 15px;
+}
+.property-title {
+    font-size: 25px;
+    font-weight: bold;
+    margin: 0 0 5px;
+}
+.property-address {
+    color: #6c757d;
+    font-size: 15px;
+    margin: 0 0 10px;
+}
+.property-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #de3737;
+    margin: 0 0 15px;
+}
+.property-amenities {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px; 
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 10px;
+}
+.amenity-item {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+.amenity-item i {
+    color: #000000; 
+    font-size: 15px;
+    margin-right: 5px;
+}
+.property-actions {
+    display: flex;
+    justify-content: space-between;
+}
+.property-actions .btn {
+    width: 48%;
+    font-size: 15px;
+}
+.furnishing-item {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 20px;
+}
+.furnishing-item i {
+    color: black;
+    font-size: 16px;
+}
+.property-status {
+    font-weight: bold;
+    font-size: 15px;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.text-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+.text-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.text-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+/* ------ PROPERTY DETAILS PHP ------ */
+.property-header {
+    background-color: #0d112b;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px 5px 0 0;
+}
+.btn-dark {
+    background-color: #0d112b;
+}
+.property-images img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+.property-sidebar {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 5px;
+}
+
+
+/* ------ INDEX PHP ------ */
+.banner {
+    position: relative;
+    height: 315px; 
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.banner img {
+    height: 100%; 
+    object-fit: cover;
+    opacity: 0.9; 
+}
+
+.banner-overlay {
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); 
+    text-align: center;
+}
+
+.banner h1 {
+    font-size: 35px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.banner p {
+    font-size: 20px;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .banner {
+        height: 180px; /* Smaller height for mobile devices */
+    }
+
+    .banner h1 {
+        font-size: 1.8rem;
+    }
+
+    .banner p {
+        font-size: 0.9rem;
+    }
+}
+
+.search-filter {
+    background-color: #CEE0F2; 
+    padding: 0px;
+   
+    margin-top: 0; /* Remove top margin from the search filter */
+    padding-top: 0;
+}
+
+.input-group-text {
+    background-color: white;
+    border: none;
+}
+
+.form-control {
+    border-radius: 30px;
+}
+
+/* ------ EDIT PROPERTY PHP ------ */
+.alert-success {
+    background-color: #28a745; 
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 16px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.alert-success i {
+    margin-right: 10px;
+}
+
+
+
+/* ------ PROPERTY DETAILS PHP ------ */
+.property-header {
+    background-color: #17a2b8; /* Navy background */
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+.property-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+.property-header p {
+    font-size: 1rem;
+    margin: 0;
+}
+.property-image-gallery img {
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%;
+    height: 180px;
+}
+.property-description {
+    margin-top: 20px;
+}
+.contact-box {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+.amenities-list span {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 15px;
+    font-size: 0.95rem;
+}
+.amenities-list span i {
+    margin-right: 5px;
+    color: #17a2b8;
+}
+.carousel-item img {
+    height: 500px;
+    object-fit: cover; 
+}
+
+
+/* ------ JOIN WAITING LIST PHP ------ */
+.joinwaitinglist-body {
+    background-color: #f8f9fa;
+}
+.joinwaitinglist-content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.joinwaitinglist-heading {
+    color: #343a40;
+    padding: 15px;
+}
+.joinwaitinglist-table {
+    background: #17a2b8;
+    border-radius: 5px;
+}
+.joinwaitinglist-btn {
+    border-radius: 5px;
+}
+.joinwaitinglist-form-label {
+    font-weight: 600;
+}
