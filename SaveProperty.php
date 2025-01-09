@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 // Ensure user is logged in
 $userID = $_SESSION['UserID'];

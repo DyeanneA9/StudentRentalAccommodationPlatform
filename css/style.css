@@ -1,21 +1,21 @@
 html, body {
-    background-color: #f3f3f3; 
-    height: 100vh;
+    background-color: #f3f3f3;
+    height: 100vh; 
     margin: 0;
-    justify-content: center;
-    align-items: center;
-    overflow-y: scroll;
+    padding: 0;
     font-family: 'Arial', sans-serif;
+    overflow: auto;
 }
 
 .wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Make the wrapper take the full height of the viewport */
+    height: 100vh; 
 }
 
 .content {
-    flex: 1; /* makes the content area grow and fill the remaining space */
+    flex-grow: 1;
+    margin-bottom: 0; 
 }
 
 .userdashboard {
@@ -180,29 +180,43 @@ header {
 
 /* ------ NAVIGATION BAR ------ */
 .navbar-nav .nav-item {
-    margin-right: 20px;
+    margin-right: 10px;
 }
 .navbar {
-    padding: 1rem;
+    padding: 12px;
+}
+.navbar-logo {
+    width: 180px;
+    height: auto; 
+    margin-left: 20px;
 }
 .nav-link {
     transition: all 0.3s ease;
     font-size: 18px;
 }
-.nav-link:hover {
-    color: #30BFBF !important;
-    text-decoration: none;
+.nav-link:hover, .nav-link.active {
+    background-color: #30BFBF;
+    color: white; 
+    text-decoration: none; 
+    border-radius: 6px; 
+}
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
 }
 
 
 /* ------ LOGIN PHP ------ */
 .login-container {
-    background-color: #fff;
-    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 8px;
     padding: 20px;
-    max-width: 500px;
-    margin: 50px auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 150px auto;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    justify-content: center;
+    align-items: center;
 }
 .login-container h2 {
     font-size: 28px;
@@ -230,7 +244,6 @@ header {
     color: #17a2b8;
     text-decoration: none;
 }
-
 .forgot-password:hover {
     text-decoration: underline;
 }
@@ -241,7 +254,7 @@ header {
     background-color: #fff;
     border-radius: 10px;
     padding: 20px;
-    max-width: 500px;
+    max-width: 1000px;
     margin: 50px auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -268,6 +281,11 @@ header {
 }
 label {
     font-weight: bold; 
+}
+.input-group-text {
+    height: 100%;
+    display: flex;
+    align-items: center; 
 }
 
 

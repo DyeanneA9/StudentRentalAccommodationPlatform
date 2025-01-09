@@ -1,8 +1,7 @@
 <?php
-// Include the necessary files
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 // Fetch user details based on the logged-in UserID
 if (isset($_SESSION['UserID'])) {

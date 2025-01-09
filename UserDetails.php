@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
+include("Authenticate.php");
 include("config.php");
-include("NavBar.php");
+include("Navigation.php");
 
 if (isset($_GET['UserID'])) {
     $UserID = intval($_GET['UserID']);

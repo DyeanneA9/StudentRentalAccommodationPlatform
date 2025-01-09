@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 if (isset($_GET['id'])) {
     $homeownerID = intval($_GET['id']); 
@@ -245,7 +245,7 @@ $stmt->close();
                                                         <p class="card-text"><?php echo htmlspecialchars($property['PropertyAddress']); ?></p>
                                                         <p class="card-text fw-bold">RM <?php echo number_format($property['PropertyPrice'], 2); ?></p>
                                                         <p><strong>Booking ID:</strong> <?php echo htmlspecialchars($property['BookingID']); ?></p>
-                                                        <p><strong>Tenant Information:</strong> <?php echo htmlspecialchars($property['StudentID']); ?></p>
+                                                        <p><strong>Tenant Info:</strong> <?php echo htmlspecialchars($property['StudentID']); ?></p>
                                                         <div class="d-flex gap-2">
                                                             <a href="ApproveBooking.php?id=<?php echo $property['BookingID']; ?>" class="btn btn-success">Approve</a>
                                                             <a href="RejectBooking.php?id=<?php echo $property['BookingID']; ?>" class="btn btn-danger">Reject</a>

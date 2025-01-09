@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 // Query to count total users
 $sql = "SELECT COUNT(*) AS total_users FROM users WHERE role != 'super_admin'";

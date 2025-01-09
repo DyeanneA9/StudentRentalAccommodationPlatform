@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
+include("Authenticate.php");
 include("config.php");
-include("NavBar.php");
+include("Navigation.php");
 
 $successMessage = "";
 $errorMessage = "";

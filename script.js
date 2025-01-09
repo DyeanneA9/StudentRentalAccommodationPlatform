@@ -51,15 +51,56 @@ document.querySelectorAll('.save-property-btn').forEach(button => {
     });
 });
 
+/* --- ADD ADMIN --- */
+function toggleAdminForm() {
+    const form = document.getElementById('addAdminForm');
+    if (form.style.display === 'none') {
+        form.style.display = 'block'; 
+    } else {
+        form.style.display = 'none';
+    }
+}
+
+/* --- DELETE USER --- */
+function deleteUser(userID) {
+    if (confirm("Are you sure you want to delete this user?")) {
+        fetch('Delete_user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ UserID: userID })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? "User deleted successfully." : "Failed to delete user.");
+            if (data.success) location.reload(); // Reload the page if successful
+        })
+        .catch(() => alert("An error occurred. Please try again."));
+    }
+}
+
+/* --- LOGIN PASSWORD VISIBILITY --- */
+function togglePasswordVisibility() {
+    const passwordField = document.getElementById("password");
+    const passwordIcon = document.getElementById("passwordIcon");
+    if (passwordField.type === "password") {
+        passwordField.type = "text"; // Show password
+        passwordIcon.classList.remove("bi-eye"); // Switch to eye-slash icon
+        passwordIcon.classList.add("bi-eye-slash");
+    } else {
+        passwordField.type = "password"; // Hide password
+        passwordIcon.classList.remove("bi-eye-slash"); // Switch to eye icon
+        passwordIcon.classList.add("bi-eye");
+    }
+}
 
 
 /* --- BOOKING FORM --- */
 function toggleForm() {
     var form = document.getElementById("bookingForm");
     if (form.style.display === "none") {
-        form.style.display = "block"; // Show the form
+        form.style.display = "block";
     } else {
-        form.style.display = "none"; // Hide the form
+        form.style.display = "none"; 
     }
 }
 

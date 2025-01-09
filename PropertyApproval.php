@@ -1,9 +1,8 @@
 <?php
-include("Auth.php");
+include("Authenticate.php");
 include("config.php");
-include("NavBar.php");
+include("Navigation.php");
 
-// Fetch properties pending approval
 $sql = "SELECT p.PropertyID, p.PropertyType, p.PropertyAddress, p.PropertyPrice, p.Description, p.Photo, 
                p.RentalAgreement, p.PropertyGrant, u.name AS owner_name, p.ListedDate 
         FROM property p

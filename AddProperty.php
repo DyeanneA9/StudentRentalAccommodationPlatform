@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 if (!isset($_SESSION['UserID'])) {
     die("Error: User not logged in.");

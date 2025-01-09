@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
+include("Authenticate.php");
 include("config.php");
-include("NavBar.php");
+include("Navigation.php");
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +58,7 @@ include("NavBar.php");
                 <!-- Search Bar -->
                 <div class="d-flex justify-content-end mb-4">
                     <form action="ManageUsers.php" method="GET" class="d-flex">
-                        <input type="text" class="form-control me-3" name="search" style="width: 250px;" placeholder="Search users by name or email" id="searchUser" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                        <input type="text" class="form-control me-3" name="search" style="width: 350px;" placeholder="Search users by name or email" id="searchUser" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                         <button class="btn search-btn" type="submit">Search</button>
                     </form>
                 </div>
@@ -108,7 +108,6 @@ include("NavBar.php");
                                     echo "<tr><td colspan='6' class='text-center'>Error: " . $conn->error . "</td></tr>";
                                 }
                             } else {
-                                // Default query to display all users when no search is performed
                                 $sql = "SELECT UserID, name, email, role, user_type, is_active 
                                         FROM users 
                                         WHERE role != 'super_admin'";
@@ -158,28 +157,9 @@ include("NavBar.php");
         <?php include 'Footer.php'; ?>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Visibility of the Add Admin Form -->
-    <script>
-    function toggleAdminForm() {
-        const form = document.getElementById('addAdminForm');
-        if (form.style.display === 'none') {
-            form.style.display = 'block'; 
-        } else {
-            form.style.display = 'none';
-        }
-    }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
 
 </body>
 </html>
-
-<!--function deleteUser(userId) {
-    if (confirm("Are you sure you want to delete this user?")) {
-        // Send a request to delete the user (e.g., using AJAX or a redirect)
-        window.location.href = "DeleteUser.php?id=" + userId;
-    }
-}
--->
