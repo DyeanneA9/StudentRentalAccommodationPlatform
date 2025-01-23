@@ -19,11 +19,8 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Property</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -50,7 +47,7 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
                     <div class="card-body">
                         <form action="AddProperty_action.php" method="POST" enctype="multipart/form-data">
                             
-                        <!-- Property Type and Address Section -->
+                        <!-- Property Type and Google map link Section -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="propertyType" class="form-label">Property Type*</label>
@@ -63,21 +60,15 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="address" class="form-label">Full Address*</label>
-                                    <textarea class="form-control" id="address" name="address" rows="2" placeholder="Enter property address" required></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Proximity and Google Maps URL Section -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="proximityToCollege" class="form-label">Proximity to College/University (in km)*</label>
-                                    <input type="number" step="0.1" class="form-control" id="proximityToCollege" name="proximityToCollege" placeholder="Enter distance to college" required>
-                                </div>
-                                <div class="col-md-6">
                                     <label for="googleMapsLink" class="form-label">Google Maps Link*</label>
                                     <input type="url" class="form-control" id="googleMapsLink" name="googleMapsLink" placeholder="Paste Your Property Location Google Maps URL" required>
                                 </div>
+                            </div>
+
+                            <!-- Address Section -->
+                            <div class="row mb-3">
+                                <label for="address" class="form-label">Full Address*</label>
+                                <textarea class="form-control" id="address" name="address" rows="2" placeholder="Enter property address" required></textarea>
                             </div>
 
                             <!-- Monthly Rent, Security Deposit, and Lease Length -->
@@ -106,10 +97,25 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
                                     <label for="leaseLength" class="form-label">Lease Length*</label>
                                     <select class="form-select" id="leaseLength" name="leaseLength" required>
                                         <option value="" disabled selected>Select lease length</option>
-                                        <option value="6 Months">6 Months</option>
-                                        <option value="1 Year">1 Year</option>
-                                        <option value="2 Years">2 Years</option>
+                                        <option value="1">1 day</option>
+                                        <option value="6">6 Months</option>
+                                        <option value="12">1 Year</option>
+                                        <option value="24">2 Years</option>
                                     </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Information -->
+                            <h6 class="section">Payment Information</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="bankNumber" class="form-label">Bank Account Number*</label>
+                                    <input type="text" class="form-control" id="bankNumber" name="bankNumber" placeholder="Enter your bank account number" required>
+                                    <small class="form-text text-muted">This will be used for payment-related purposes.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bankName" class="form-label">Bank Name*</label>
+                                    <input type="text" class="form-control" id="bankName" name="bankName" placeholder="Enter your bank name" required>
                                 </div>
                             </div>
 
@@ -178,6 +184,7 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
                                     </div>
                                 </div>
                             </div>
+                            <div id="furnishingDescription" class="mt-3"></div>
 
                             <!-- Amenities -->
                             <div class="mb-3">
@@ -249,8 +256,8 @@ $successMessage = isset($_GET['success']) && $_GET['success'] == '1';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="script.js"></script>
+
 </body>
 </html>
 
