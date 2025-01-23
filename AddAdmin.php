@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = trim($_POST['adminPhone']);
     $password = trim($_POST['adminPassword']);
 
-    // Validate inputs
     $errors = [];
     if (empty($name)) {
         $errors[] = "Full name is required.";
@@ -31,18 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach ($errors as $error) {
             echo "<p style='color: red;'>$error</p>";
         }
-        exit; // Stop execution if validation fails
+        exit; 
     }
 
-    // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
+    $defaultProfilePicturePath = 'image/default_admin.png';
+
     // Insert admin into the database
-    $sql = "INSERT INTO users (name, email, phone_number, password, role, is_approved) VALUES (?, ?, ?, ?, 'admin', 1)";
+    $sql = "INSERT INTO users (name, email, phone_number, password, role, user_type, profile_picture, is_approved) VALUES (?, ?, ?, ?, 'admin', '', ?, 1)";
     $stmt = $conn->prepare($sql);
 
     if ($stmt) {
-        $stmt->bind_param("ssss", $name, $email, $phone, $hashedPassword);
+        $stmt->bind_param("sssss", $name, $email, $phone, $hashedPassword, $defaultProfilePicturePath);
         if ($stmt->execute()) {
             echo "<p style='color: green;'>Admin added successfully!</p>";
             header("Location: ManageUsers.php"); 
