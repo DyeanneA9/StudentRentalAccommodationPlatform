@@ -55,7 +55,6 @@ if ($result->num_rows > 0) {
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
                                         <h5 class="fw-bold mb-1"><?php echo htmlspecialchars($property['PropertyType']); ?></h5>
-                                        <span class="badge bg-warning text-dark">Pending Approval</span>
                                     </div>
                                     <small class="text-muted">Submitted: <?php echo htmlspecialchars($property['ListedDate']); ?></small>
                                 </div>
@@ -68,8 +67,7 @@ if ($result->num_rows > 0) {
                                         $photos = json_decode($property['Photo'], true);
                                         $firstPhoto = isset($photos[0]) ? $photos[0] : 'path/to/default-image.jpg';
                                         ?>
-                                        <img src="<?php echo htmlspecialchars($firstPhoto); ?>" class="img-fluid rounded" 
-                                             style="object-fit: cover; height: 120px; width: 100%;" alt="Property Image">
+                                        <img src="<?php echo htmlspecialchars($firstPhoto); ?>" class="img-fluid rounded" style="object-fit: cover; height: 280px; width: 100%;" alt="Property Image">
                                     </div>
 
                                     <!-- Property Details -->
@@ -107,7 +105,7 @@ if ($result->num_rows > 0) {
 
                                 <!-- Actions -->
                                 <div class="mt-4 d-flex justify-content-end">
-                                    <a href="PropertyDetails.php?id=<?php echo $property['PropertyID']; ?>" class="btn btn-primary me-2">View Details</a>
+                                    <a href="PropertyDetails.php?id=<?php echo $property['PropertyID']; ?>" class="btn btn-primary me-2">View Property</a>
                                     <button class="btn btn-success me-2" onclick="approveProperty(<?php echo $property['PropertyID']; ?>)">Approve</button>
                                     <button class="btn btn-danger" onclick="openRejectModal(<?php echo $property['PropertyID']; ?>)">Reject</button>
                                 </div>
@@ -197,7 +195,7 @@ if ($result->num_rows > 0) {
                                             ?>
                                         </td>
                                         <td>
-                                            <a href="PropertyDetails.php?id=<?php echo $property['PropertyID']; ?>" class="btn btn-sm btn-info">View</a>
+                                            <a href="PropertyDetails.php?id=<?php echo $property['PropertyID']; ?>" class="btn btn-sm btn-view-info">View</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -1,8 +1,9 @@
 
-/* --- REGISTER POP UP MESSAGE --- */
+/* --- REGISTER --- */
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
 
+    // Show success or error modal based on URL parameters
     if (urlParams.has('success')) {
         const successModal = new bootstrap.Modal(document.getElementById('successModal'));
         successModal.show();
@@ -51,47 +52,6 @@ document.querySelectorAll('.save-property-btn').forEach(button => {
     });
 });
 
-/* --- ADD ADMIN --- */
-function toggleAdminForm() {
-    const form = document.getElementById('addAdminForm');
-    if (form.style.display === 'none') {
-        form.style.display = 'block'; 
-    } else {
-        form.style.display = 'none';
-    }
-}
-
-/* --- DELETE USER --- */
-function deleteUser(userID) {
-    if (confirm("Are you sure you want to delete this user?")) {
-        fetch('Delete_user.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ UserID: userID })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.success ? "User deleted successfully." : "Failed to delete user.");
-            if (data.success) location.reload(); // Reload the page if successful
-        })
-        .catch(() => alert("An error occurred. Please try again."));
-    }
-}
-
-/* --- LOGIN PASSWORD VISIBILITY --- */
-function togglePasswordVisibility() {
-    const passwordField = document.getElementById("password");
-    const passwordIcon = document.getElementById("passwordIcon");
-    if (passwordField.type === "password") {
-        passwordField.type = "text"; // Show password
-        passwordIcon.classList.remove("bi-eye"); // Switch to eye-slash icon
-        passwordIcon.classList.add("bi-eye-slash");
-    } else {
-        passwordField.type = "password"; // Hide password
-        passwordIcon.classList.remove("bi-eye-slash"); // Switch to eye icon
-        passwordIcon.classList.add("bi-eye");
-    }
-}
 
 
 /* --- BOOKING FORM --- */
@@ -124,8 +84,70 @@ function generateEndDate() {
     EndDateInput.value = `${year}-${month}-${day}`;
 }
 
+/* --- ADD PROPERTY PHP --- */
+function calculateRentPerPerson() {
+    const monthlyRent = parseFloat(document.getElementById("monthlyRent").value);
+    const totalTenants = parseInt(document.getElementById("totalTenants").value);
+    const rentPerPersonField = document.getElementById("monthlyRentPerPerson");
 
-/* --- PREVIEW IMAGES ON EDITPROPERTY PHP --- */
+    if (!isNaN(monthlyRent) && !isNaN(totalTenants) && totalTenants > 0) {
+        const rentPerPerson = monthlyRent / totalTenants;
+        rentPerPersonField.value = rentPerPerson.toFixed(2); // Format to 2 decimal places
+    } else {
+        rentPerPersonField.value = "Invalid Input";
+    }
+}
+
+// Add event listeners
+document.getElementById("totalRent").addEventListener("input", calculateRentPerPerson);
+document.getElementById("numberOfPeople").addEventListener("input", calculateRentPerPerson);
+
+// Furnishing Details
+function updateFurnishingDetails(furnishingType) {
+    const furnishingDescription = document.getElementById("furnishingDescription");
+    const furnishingDetails = {
+        "Fully Furnished": `
+            <ul>
+                <li>Bed and Mattress</li>
+                <li>Wardrobe</li>
+                <li>Sofa</li>
+                <li>Dining Table and Chairs</li>
+                <li>Refrigerator</li>
+                <li>Gas Stove</li>
+                <li>Washing Machine</li>
+                <li>Air Conditioner/Fan</li>
+            </ul>
+        `,
+        "Partially Furnished": `
+            <ul>
+                <li>Bed and Mattress</li>
+                <li>Wardrobe</li>
+                <li>Dining Table</li>
+                <li>Gas Stove</li>
+                <li>Air Conditioner/Fan</li>
+            </ul>
+        `,
+        "Not Furnished": `<p>No furnishings provided.</p>`
+    };
+    furnishingDescription.innerHTML = furnishingDetails[furnishingType] || "<p>Select a furnishing type to view details.</p>";
+}
+
+
+/* --- EDIT PROPERTY PHP --- */
+// Function for the edit property form
+function calculateRentPerPersonEdit() {
+    // Get values of Monthly Rent and Total Tenants
+    const monthlyRent = parseFloat(document.getElementById("monthlyRent").value) || 0;
+    const totalTenants = parseInt(document.getElementById("totalTenants").value) || 1;
+
+    // Calculate Monthly Rent Per Person
+    const rentPerPerson = totalTenants > 0 ? (monthlyRent / totalTenants).toFixed(2) : 0;
+
+    // Update the Monthly Rent Per Person field
+    document.getElementById("monthlyRentPerPerson").value = rentPerPerson;
+}
+
+// preview images
 document.querySelector('input[name="propertyImage[]"]').addEventListener('change', function() {
     if (this.files.length > 0) {
         const fileList = Array.from(this.files).map(file => file.name).join(', ');
@@ -135,7 +157,7 @@ document.querySelector('input[name="propertyImage[]"]').addEventListener('change
     }
 });
 
-/* --- UPDATED SUCCESSFULLY ON EDITPROPERTY PHP --- */ 
+// updated successfully
 // Check if the URL has a success parameter
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('success')) {
@@ -143,7 +165,7 @@ if (urlParams.has('success')) {
     successModal.show();
 }
 
-/* --- DELETE PROPERTY IMAGE ON EDITPROPERTY PHP --- */
+// delete property image
 function deleteImage(imagePath) {
     if (confirm("Are you sure you want to delete this image?")) {
         // AJAX request to delete the image from the database
@@ -163,6 +185,7 @@ function deleteImage(imagePath) {
     }
 }
 
+/* --- SUPER ADMIN PHP --- */
 function approveUser(userID) {
     if (confirm("Are you sure you want to approve this user?")) {
         const form = document.createElement("form");
@@ -204,12 +227,6 @@ function approveProperty(propertyID) {
     }
 }
 
-/*function rejectProperty(propertyID) {
-    if (confirm("Are you sure you want to reject this property?")) {
-        // Make the POST request to reject the property
-        performPropertyAction(propertyID, 'reject');
-    }
-}*/
 
 function openRejectModal(propertyID) {
     document.getElementById('rejectPropertyID').value = propertyID;
@@ -255,56 +272,37 @@ function togglePendingPropertyApprovals() {
     userSection.style.display = "none";
 }
 
-/* ---- UPDATE PROFILE PICTURE ---- */
-const editProfileBtn = document.getElementById('editProfileBtn');
-const editProfileForm = document.getElementById('editProfileForm');
-const cancelEditBtn = document.getElementById('cancelEditBtn');
-
-// Show the form when Edit Profile button is clicked
-editProfileBtn.addEventListener('click', () => {
-    editProfileForm.style.display = 'block';
-    editProfileBtn.style.display = 'none'; // Hide the button while editing
-});
-
-// Hide the form and show the Edit Profile button when Cancel is clicked
-cancelEditBtn.addEventListener('click', () => {
-    editProfileForm.style.display = 'none';
-    editProfileBtn.style.display = 'block';
-});
-
-// Furnishing Details
-function updateFurnishingDetails(furnishingType) {
-    const furnishingDescription = document.getElementById("furnishingDescription");
-
-    // Define descriptions for each furnishing type
-    const furnishingDetails = {
-        "Fully Furnished": `
-            <ul>
-                <li>Bed and Mattress</li>
-                <li>Wardrobe</li>
-                <li>Sofa</li>
-                <li>Dining Table and Chairs</li>
-                <li>Refrigerator</li>
-                <li>Gas Stove</li>
-                <li>Washing Machine</li>
-                <li>Air Conditioner/Fan</li>
-            </ul>
-        `,
-        "Partially Furnished": `
-            <ul>
-                <li>Bed and Mattress</li>
-                <li>Wardrobe</li>
-                <li>Dining Table</li>
-                <li>Gas Stove</li>
-                <li>Air Conditioner/Fan</li>
-            </ul>
-        `,
-        "Not Furnished": `<p>No furnishings provided.</p>`
-    };
-
-    // Update the description box content
-    furnishingDescription.innerHTML = furnishingDetails[furnishingType] || "<p>Select a furnishing type to view details.</p>";
+// add admin
+function toggleAdminForm() {
+    const form = document.getElementById('addAdminForm');
+    if (form.style.display === 'none') {
+        form.style.display = 'block'; 
+    } else {
+        form.style.display = 'none';
+    }
 }
+
+/* --- STUDENT AND HOMEOWNER PROFILE PHP --- */
+// update profile picture 
+document.addEventListener('DOMContentLoaded', () => {
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn'); 
+    const editProfileForm = document.getElementById('editProfileForm'); 
+
+    // Show the form when the Edit button is clicked
+    editProfileBtn.addEventListener('click', () => {
+        editProfileForm.style.display = 'block'; // Show the form
+        editProfileBtn.style.display = 'none'; // Hide the Edit button
+    });
+
+    // Hide the form and show the Edit button when Cancel is clicked
+    cancelEditBtn.addEventListener('click', () => {
+        editProfileForm.style.display = 'none'; // Hide the form
+        editProfileBtn.style.display = 'inline-block'; // Show the Edit button
+    });
+});
+
+
 
 setTimeout(function() {
     var alert = document.querySelector('.alert');
@@ -313,7 +311,7 @@ setTimeout(function() {
     }
 }, 5000); // Close alert after 5 seconds
 
-/* ------ Book Button ------ */
+/* ------ PROPERTY DETAILS PHP ------ */
 document.getElementById("bookPropertyBtn").addEventListener("click", function() {
     var form = document.getElementById("bookingForm");
     if (form.style.display === "none" || form.style.display === "") {
@@ -323,7 +321,8 @@ document.getElementById("bookPropertyBtn").addEventListener("click", function() 
     }
 });
 
-function calculateRentPerPerson() {
+// Book Button
+function calculateRentPerPersonBooking() {
     // Get the values of Monthly Rent and Total Tenants
     const monthlyRent = parseFloat(document.getElementById('monthlyRent').value) || 0;
     const totalTenants = parseInt(document.getElementById('totalTenants').value) || 0;
@@ -346,3 +345,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+/* ------ NOTIFICATION ------ */

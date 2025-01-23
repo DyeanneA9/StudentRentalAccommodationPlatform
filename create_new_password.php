@@ -1,6 +1,6 @@
 <?php 
 include("config.php");
-include("NavBar.php");
+include("Navigation.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['new_password'])) {
     $email = trim($_POST['email']);
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
         }
 
         // Redirect to login page after password reset
-        header("Location: login.php?reset=success");
+        header("Location: Login.php?reset=success");
         exit;
     } else {
         $error = "An error occurred. Please try again.";

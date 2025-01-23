@@ -1,57 +1,21 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("Navbar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
+// Ensure the user is logged in
 if (!isset($_SESSION['UserID'])) {
     die("Error: User not logged in.");
 }
 
+// Ensure Property ID is provided
 if (isset($_GET['id'])) {
-    $property_id = $_GET['id'];
+    $propertyID = $_GET['id'];
 } else {
     die("Error: Property ID not provided.");
 }
 
-// message for delete property photo
-if (isset($_SESSION['delete_success'])) {
-    echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle"></i> ' . $_SESSION['delete_success'] . '
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>';
-    unset($_SESSION['delete_success']);  // Unset the session variable after displaying the message
-} elseif (isset($_SESSION['delete_error'])) {
-    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle"></i> ' . $_SESSION['delete_error'] . '
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>';
-    unset($_SESSION['delete_error']);  // Unset the session variable after displaying the message
-}
-
-// message for updating property
-if (isset($_SESSION['success_message'])) {
-    echo "
-        <div class='alert alert-success alert-dismissible fade show' role='alert'>
-            <i class='fas fa-check-circle'></i> <strong>Success!</strong> " . $_SESSION['success_message'] . "
-            <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
-                <span aria-hidden='true'>&times;</span>
-            </button>
-        </div>
-    ";
-    // Unset the success message after displaying it
-    unset($_SESSION['success_message']);
-} elseif (isset($_SESSION['error_message'])) {
-    echo "
-        <div class='alert alert-danger alert-dismissible fade show' role='alert'>
-            <i class='fas fa-exclamation-circle'></i> <strong>Error!</strong> " . $_SESSION['error_message'] . "
-        </div>
-    ";
-    // Unset the error message after displaying it
-    unset($_SESSION['error_message']);
-}
-
-$propertyID = $_GET['id'];
-
+// Fetch property details
 $sql = "SELECT * FROM property WHERE PropertyID = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $propertyID);
@@ -60,8 +24,14 @@ if ($stmt->execute()) {
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $propertyData = $result->fetch_assoc();
-        $photos = $propertyData['Photo']; 
-        $photoArray = explode(",", $photos);
+
+        // Safely retrieve data or use fallback values
+        $googleMapsLink = $propertyData['google_maps_url'] ?? '';
+        $address = $propertyData['PropertyAddress'] ?? '';
+        $bankNumber = $propertyData['bankNumber'] ?? ''; 
+        $bankName = $propertyData['bankName'] ?? '';
+        $photos = $propertyData['Photo'] ?? '[]';
+        $photoArray = json_decode($photos, true) ?? [];
     } else {
         die("Error: Property not found.");
     }
@@ -78,19 +48,25 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Property</title>
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
     <div class="wrapper">
         <main class="content">
             <div class="container my-5">
+                <!-- Display Success or Error Messages -->
+                <?php if (isset($_SESSION['success_message'])): ?>
+                    <div class="alert alert-success">
+                        <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
+                    </div>
+                <?php elseif (isset($_SESSION['error_message'])): ?>
+                    <div class="alert alert-danger">
+                        <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="card">
                     <div class="form-header">
                         <h5>Edit Property</h5>
@@ -100,7 +76,7 @@ $stmt->close();
                         <form action="EditProperty_action.php" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="<?php echo $propertyID; ?>" />
                             
-                            <!-- Property Type and Address Section -->
+                            <!-- Property Type and Google Map Section -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="propertyType" class="form-label">Property Type*</label>
@@ -112,21 +88,14 @@ $stmt->close();
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="address" class="form-label">Full Address*</label>
-                                    <textarea class="form-control" id="address" name="address" rows="2" required><?php echo $propertyData['PropertyAddress']; ?></textarea>
-                                </div>
+                                    <label for="googleMapsLink" class="form-label">Google Maps Link*</label>
+                                    <input type="url" class="form-control" id="googleMapsLink" name="googleMapsLink" value="<?php echo htmlspecialchars($googleMapsLink); ?>" required>                                </div>
                             </div>
 
-                            <!-- Proximity and Google Maps URL -->
+                            <!-- Address -->
                             <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="proximityToCollege" class="form-label">Proximity to College/University (in km)*</label>
-                                    <input type="number" step="0.1" class="form-control" id="proximityToCollege" name="proximityToCollege" value="<?php echo $propertyData['Proximity']; ?>" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="googleMapsLink" class="form-label">Google Maps Link*</label>
-                                    <input type="url" class="form-control" id="googleMapsLink" name="googleMapsLink" value="<?php echo $propertyData['google_maps_url']; ?>" required>
-                                </div>
+                                <label for="address" class="form-label">Full Address*</label>
+                                <textarea class="form-control" id="address" name="address" rows="2" required><?php echo htmlspecialchars($address); ?></textarea>
                             </div>
 
                             <!-- Monthly Rent, Security Deposit, and Lease Length -->
@@ -134,12 +103,12 @@ $stmt->close();
                             <div class="row mb-3">
                                 <div class="col-md-4">
                                     <label for="monthlyRent" class="form-label">Monthly Rent (RM)*</label>
-                                    <input type="number" class="form-control" id="monthlyRent" name="monthlyRent" value="<?php echo $propertyData['PropertyPrice']; ?>" required oninput="calculateRentPerPerson()">
+                                    <input type="number" class="form-control" id="monthlyRent" name="monthlyRent" value="<?php echo $propertyData['PropertyPrice']; ?>" required oninput="calculateRentPerPersonEdit()">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label for="totalTenants" class="form-label">Total Tenants Needed*</label>
-                                    <input type="number" class="form-control" id="totalTenants" name="totalTenants" value="<?php echo $propertyData['TotalTenants']; ?>" required oninput="calculateRentPerPerson()">
+                                    <input type="number" class="form-control" id="totalTenants" name="totalTenants" value="<?php echo $propertyData['TotalTenants']; ?>" required oninput="calculateRentPerPersonEdit()">
                                 </div>
 
                                 <div class="col-md-4">
@@ -163,7 +132,21 @@ $stmt->close();
                                 </div>
                             </div>
 
-                            <!-- Rental Agreement and Property Grant Display -->
+                            <!-- Payment Information -->
+                            <h6 class="section">Payment Information</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="bankNumber" class="form-label">Bank Account Number*</label>
+                                    <input type="text" class="form-control" id="bankNumber" name="bankNumber" placeholder="Enter your bank number"  value="<?php echo $bankNumber; ?>" required>
+                                    <small class="form-text text-muted">This will be used for payment-related purposes.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bankName" class="form-label">Bank Name*</label>
+                                    <input type="text" class="form-control" id="bankName" name="bankName" placeholder="Enter your bank name"  value="<?php echo $bankName; ?>" required>
+                                </div>
+                            </div>
+
+                            <!-- Documents Section -->
                             <h6 class="section">Documents</h6>
                             <div class="row mb-3">
                                 <!-- Property Grant -->
@@ -203,97 +186,73 @@ $stmt->close();
                                 </div>
                             </div>
 
-
-                            <!-- No. of Bedrooms, Bathrooms, and Property Description -->
+                            <!-- Furnishing and Amenities -->
                             <h6 class="section">Furnishing and Amenities</h6>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="noOfBedrooms" class="form-label">No. of Bedrooms*</label>
-                                    <input type="number" class="form-control" id="noOfBedrooms" name="noOfBedrooms" placeholder="Enter number of bedrooms" value="<?php echo $propertyData['NoOfBedroom']; ?>" required>
+                                    <input type="number" class="form-control" id="noOfBedrooms" name="noOfBedrooms" value="<?php echo $propertyData['NoOfBedroom']; ?>" required>
 
                                     <label for="noOfBathrooms" class="form-label">No. of Bathrooms*</label>
-                                    <input type="number" class="form-control" id="noOfBathrooms" name="noOfBathrooms" placeholder="Enter number of bathrooms" value="<?php echo $propertyData['NoOfBathroom']; ?>" required>
+                                    <input type="number" class="form-control" id="noOfBathrooms" name="noOfBathrooms" value="<?php echo $propertyData['NoOfBathroom']; ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="propertyDescription" class="form-label">Property Description*</label>
-                                    <textarea class="form-control" id="propertyDescription" name="propertyDescription" rows="4" placeholder="Enter property description" required><?php echo $propertyData['Description']; ?></textarea>
+                                    <textarea class="form-control" id="propertyDescription" name="propertyDescription" rows="4" required><?php echo $propertyData['Description']; ?></textarea>
                                 </div>
                             </div>
 
-                            <!-- Furnishing Details -->
                             <div class="mb-3">
                                 <label class="form-label">Furnishing Details*</label>
                                 <div class="row">
+                                    <!-- Furnishing options -->
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" id="fullyFurnished" name="furnishing" value="Fully Furnished" <?php echo ($propertyData['Furnishing'] == 'Fully Furnished') ? 'checked' : ''; ?> onchange="updateFurnishingDetails(this.value)">
-                                            <label class="form-check-label" for="fullyFurnished">
-                                                <i class="bi bi-house-fill"></i> Fully Furnished
-                                            </label>
+                                            <input class="form-check-input" type="radio" id="fullyFurnished" name="furnishing" value="Fully Furnished" <?php echo ($propertyData['Furnishing'] == 'Fully Furnished') ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="fullyFurnished">Fully Furnished</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" id="partiallyFurnished" name="furnishing" value="Partially Furnished" <?php echo ($propertyData['Furnishing'] == 'Partially Furnished') ? 'checked' : ''; ?> onchange="updateFurnishingDetails(this.value)">
-                                            <label class="form-check-label" for="partiallyFurnished">
-                                                <i class="bi bi-house-door"></i> Partially Furnished
-                                            </label>
+                                            <input class="form-check-input" type="radio" id="partiallyFurnished" name="furnishing" value="Partially Furnished" <?php echo ($propertyData['Furnishing'] == 'Partially Furnished') ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="partiallyFurnished">Partially Furnished</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" id="notFurnished" name="furnishing" value="Not Furnished" <?php echo ($propertyData['Furnishing'] == 'Not Furnished') ? 'checked' : ''; ?> onchange="updateFurnishingDetails(this.value)">
-                                            <label class="form-check-label" for="notFurnished">
-                                                <i class="bi bi-house"></i> Not Furnished
-                                            </label>
+                                            <input class="form-check-input" type="radio" id="notFurnished" name="furnishing" value="Not Furnished" <?php echo ($propertyData['Furnishing'] == 'Not Furnished') ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="notFurnished">Not Furnished</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Amenities -->
+                            <!-- Amenities Section -->
                             <div class="mb-3">
                                 <label class="form-label">Amenities*</label>
                                 <div class="row">
-                                    <!-- Iterate through amenities and check if they are selected -->
                                     <div class="col-md-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="wifi" name="amenities[]" value="WiFi" <?php echo (in_array('WiFi', explode(',', $propertyData['PropertyAmenities']))) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="wifi">
-                                                <i class="bi bi-wifi"></i> WiFi
-                                            </label>
+                                            <label class="form-check-label" for="wifi">WiFi</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="parking" name="amenities[]" value="Parking" <?php echo (in_array('Parking', explode(',', $propertyData['PropertyAmenities']))) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label" for="parking">
-                                                <i class="bi bi-car-front"></i> Parking
-                                            </label>
+                                            <label class="form-check-label" for="parking">Parking</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="gym" name="amenities[]" value="Gym">
-                                            <label class="form-check-label" for="gym">
-                                                <i class="bi bi-dumbbell"></i> Gym
-                                            </label>
+                                            <label class="form-check-label" for="gym">Gym</label>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="security" name="amenities[]" value="24/7 Security">
-                                            <label class="form-check-label" for="security">
-                                                <i class="bi bi-shield-lock"></i> 24/7 Security
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="pool" name="amenities[]" value="Pool">
-                                            <label class="form-check-label" for="pool">
-                                                <i class="bi bi-water"></i> Pool
-                                            </label>
+                                            <label class="form-check-label" for="security">24/7 Security</label>
                                         </div>
                                     </div>
                                 </div>
@@ -321,20 +280,14 @@ $stmt->close();
                                     echo "Error: Invalid photo data.";
                                 }
                                 ?>
-
+                                
                                 <!-- File Input for Uploading New Photos -->
                                 <input type="file" id="propertyPhotos" name="propertyPhotos[]" class="form-control" accept="image/*" multiple>
                             </div>
 
                             <!-- Submit Button -->
                             <div class="text-end">
-                                <?php if ($propertyData['is_approved'] == -1): ?>
-                                    <!-- Resubmit Property Button -->
-                                    <button type="submit" class="btn btn-warning">Resubmit Property</button>
-                                <?php else: ?>
-                                    <!-- Update Property Button -->
-                                    <button type="submit" class="btn btn-primary">Update Property</button>
-                                <?php endif; ?>
+                                <button type="submit" class="btn btn-primary">Update Property</button>
                             </div>
 
                         </form>
@@ -343,26 +296,11 @@ $stmt->close();
             </div>
         </main>
 
-        <!-- Footer Section-->
         <?php include 'Footer.php'; ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
-
-    <script>
-    function calculateRentPerPerson() {
-        // Get values of Monthly Rent and Total Tenants
-        const monthlyRent = parseFloat(document.getElementById("monthlyRent").value) || 0;
-        const totalTenants = parseInt(document.getElementById("totalTenants").value) || 1;
-
-        // Calculate Monthly Rent Per Person
-        const rentPerPerson = totalTenants > 0 ? (monthlyRent / totalTenants).toFixed(2) : 0;
-
-        // Update the Monthly Rent Per Person field
-        document.getElementById("monthlyRentPerPerson").value = rentPerPerson;
-    }
-    </script>
 
 </body>
 </html>

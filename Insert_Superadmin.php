@@ -4,7 +4,7 @@ include("config.php");
 // Super admin credentials
 $name = 'Super Admin';
 $email = 'superadmin@gmail.com';
-$password = password_hash('SRAPSuperadmin2024', PASSWORD_BCRYPT); // Hash the password
+$password = password_hash('SRAPSuperadmin2024', PASSWORD_BCRYPT);
 $role = 'super_admin';
 
 // Insert super admin into the database

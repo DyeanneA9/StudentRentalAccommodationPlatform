@@ -1,6 +1,6 @@
 <?php
 include("config.php");
-include("Auth.php");
+include("Authenticate.php");
 
 $propertyID = isset($_GET['id']) ? intval($_GET['id']) : null;
 $userID = isset($_SESSION['UserID']) ? $_SESSION['UserID'] : null; 
@@ -25,6 +25,7 @@ $propertyType = $property['PropertyType'];
 $leaseLength = $property['LeaseLength'];
 $monthlyRent = $property['PropertyPrice'];
 $listedDate = $property['ListedDate'];
+$totalTenantsRequired = $property['TotalTenants'];
 
 // Fetch user details
 $queryUser = "SELECT * FROM users WHERE UserID = ?";
@@ -131,6 +132,12 @@ if (!$user) {
 <script>
     const monthlyRent = <?php echo $monthlyRent; ?>; // Fetch the monthly rent from PHP
     const totalTenantsRequired = <?php echo $property['TotalTenants']; ?>; // Fetch the required total tenants
+    const leaseLength = <?php echo $leaseLength; ?>; // Fetch the lease length from PHP (in months)
+    
+    // Disable "Group Booking" if only 1 tenant is required
+    if (totalTenantsRequired === 1) {
+        document.querySelector('select[name="bookingType"] option[value="group"]').disabled = true;
+    }
 
     // Update Monthly Rent Per Person based on booking type
     document.getElementById("bookingType").addEventListener("change", function () {
@@ -159,11 +166,17 @@ if (!$user) {
     const listedDate = "<?php echo $listedDate; ?>"; // Fetch the property upload date
     moveInDateInput.setAttribute("min", listedDate);
 
-    // Dynamically calculate the move-out date based on lease length
+    // Dynamically calculate the move-out date based on lease length and move-in date
     moveInDateInput.addEventListener("change", function () {
         const moveInDate = new Date(this.value);
-        const leaseLength = <?php echo $leaseLength; ?>; // Lease length in months
-        moveInDate.setMonth(moveInDate.getMonth() + leaseLength);
+
+        if (leaseLength === 1) {
+            // If lease length is 1 day, add 1 day to the move-in date
+            moveInDate.setDate(moveInDate.getDate() + 1);
+        } else {
+            // Add the lease length (in months) to the move-in date for other lease lengths
+            moveInDate.setMonth(moveInDate.getMonth() + leaseLength);
+        }
 
         // Format the date as YYYY-MM-DD
         const moveOutDate = moveInDate.toISOString().split("T")[0];
@@ -177,25 +190,26 @@ if (!$user) {
         groupMembersDiv.innerHTML = ''; // Clear existing fields
 
         for (let i = 1; i < numPeople; i++) {
-        groupMembersDiv.innerHTML += `
-            <h5>Member ${i}</h5>
-            <div class="mb-3">
-                <label for="name${i}" class="form-label">Name:</label>
-                <input type="text" name="memberName[]" id="name${i}" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="icUpload${i}" class="form-label">Upload IC (Front and Back):</label>
-                <input type="file" name="memberIC[]" id="icUpload${i}" class="form-control" accept=".png, .jpg, .jpeg, .pdf" required>
-            </div>
-            <div class="mb-3">
-                <label for="phone${i}" class="form-label">Phone Number:</label>
-                <input type="tel" name="memberPhone[]" id="phone${i}" class="form-control" required>
-            </div>
-            <hr>
-        `;
+            groupMembersDiv.innerHTML += `
+                <h5>Member ${i}</h5>
+                <div class="mb-3">
+                    <label for="name${i}" class="form-label">Name:</label>
+                    <input type="text" name="memberName[]" id="name${i}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="icUpload${i}" class="form-label">Upload IC (Front and Back):</label>
+                    <input type="file" name="memberIC[]" id="icUpload${i}" class="form-control" accept=".png, .jpg, .jpeg, .pdf" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone${i}" class="form-label">Phone Number:</label>
+                    <input type="tel" name="memberPhone[]" id="phone${i}" class="form-control" required>
+                </div>
+                <hr>
+            `;
         }
-    });    
+    });
 </script>
+
 <?php if (isset($_GET['status']) && isset($_GET['message'])): ?>
     <script>
         window.onload = function() {

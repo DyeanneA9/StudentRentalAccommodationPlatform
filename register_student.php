@@ -5,7 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['studentEmail']);
     $phone = trim($_POST['studentPhone']);
+
+    // Remove leading '0' from the phone number if present
+    if (strpos($phone, '0') === 0) {
+        $phone = substr($phone, 1);
+    }
     $phoneWithPrefix = "+60" . $phone; 
+    
     $password = trim($_POST['studentPassword']);
     $university = trim($_POST['universitySelect']);
     $gender = trim($_POST['studentGender']);
@@ -15,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $alt_security_answer = trim($_POST['security_answer_2']);
     $student_id_file = ($_FILES['studentIDUpload']) ? $_FILES['studentIDUpload'] : null;;
 
-    // Validate mandatory fields
     $errors = [];
     if (empty($name)) {
         $errors[] = "Full Name is required.";
@@ -27,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (empty($phone)) {
         $errors[] = "Phone Number is required.";
+    } elseif (!preg_match('/^[0-9]{9,10}$/', $phone)) {
+        $errors[] = "Invalid phone number format. Please enter 9 to 10 digits.";
     }
     if (empty($password)) {
         $errors[] = "Password is required.";
@@ -70,17 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } elseif (empty($_FILES['studentIDUpload'])) {
-        $student_id_path = null; // No file uploaded
+        $student_id_path = null; 
     } else {
         $errors[] = "An error occurred during the file upload.";
     }
 
-    // If there are validation errors, return them
     if (!empty($errors)) {
         foreach ($errors as $error) {
             echo "<p style='color: red;'>$error</p>";
         }
-        exit; // Stop execution if validation fails
+        exit; 
     }
 
     // Hash the password and security answers
@@ -88,7 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hashed_security_answer = password_hash($security_answer, PASSWORD_BCRYPT);
     $hashed_alt_security_answer = password_hash($alt_security_answer, PASSWORD_BCRYPT);
 
-    // Prepare and execute MySQLi query
     $stmt = $conn->prepare("
         INSERT INTO users 
         (name, email, phone_number, password, role, user_type, university, gender, security_question, security_answer, alternative_question, alternative_answer, student_id, is_approved) 
@@ -112,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($stmt->execute()) {
-            header("Location: register.php?success=1");
+            header("Location: Register.php?success=1");
             exit();
         } else {
-            header("Location: register.php?error=1");
+            header("Location: Register.php?error=1");
             exit();
         }        
 

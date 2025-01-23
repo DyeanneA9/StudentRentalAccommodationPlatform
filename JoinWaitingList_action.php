@@ -1,6 +1,6 @@
 <?php
-include("Auth.php");
 include("config.php");
+include("Authenticate.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $waitingListID = isset($_POST['waitingListID']) ? intval($_POST['waitingListID']) : null;

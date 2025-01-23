@@ -201,10 +201,29 @@ header {
     border-radius: 6px; 
 }
 .profile-picture {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 45px;
     border-radius: 50%;
 }
+
+
+/* ------ DASHBOARD ------ */
+.property-image {
+    height: 200px;
+    object-fit: cover;
+    width: 100%; 
+    border-radius: 4px;
+}
+.form-control,
+.form-select {
+    height: 45px; 
+}
+.btn.search-btn {
+    height: 45px; 
+    padding: 0 20px; 
+    line-height: 1.5; 
+}
+
 
 
 /* ------ LOGIN PHP ------ */
@@ -291,26 +310,47 @@ label {
 
 /* ------ FORGOT PASSWORD PHP ------ */
 .reset-container {
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
     max-width: 500px;
     margin: 50px auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    background: var(--form-bg-color, #ffffff);
+    border: 1px solid var(--form-border-color, #e0e0e0);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-.text-center h2 {
-    font-weight: 600; 
-    margin-bottom: 20px; 
+.reset-container h2 {
+    font-size: 28px;
+    color: var(--text-primary-color, #343a40);
+    text-transform: uppercase;
+    text-align: center;
 }
-.form-control {
-    border-radius: 5px; 
+.reset-container p {
+    font-size: 14px;
+    color: var(--text-secondary-color, #6c757d);
+    margin-bottom: 20px;
+    text-align: center;
 }
+.reset-container .form-control {
+    border-radius: 20px;
+    padding: 10px;
+}
+.reset-container .btn-primary {
+    border-radius: 20px;
+    font-weight: bold;
+    background: var(--button-bg-color, #17a2b8);
+    border: none;
+}
+.reset-container .btn-primary:hover {
+    background: var(--button-hover-bg-color, #138496);
+}
+
+
 
 /* ------ DASHBOARD PHP ------ */
 .welcome {
     text-align: center;
     padding: 20px;
-    background-color:#72eaea;
+    background-color:#c0dbf0;
 }
 .bg-light-red {
     background-color: #f8d7da;
@@ -398,7 +438,18 @@ label {
     margin: 0;
     color: #6c757d; 
 }
-
+.badge {
+    display: inline-block;
+    padding: 0.4em 0.6em;
+    font-size: 0.75em;
+    font-weight: 700;
+    color: #fff;
+    background-color: rgb(232, 43, 43);
+    border-radius: 50%;
+    position: relative;
+    top: -10px; 
+    left: 5px; 
+}
 
 /* ------ ADD PROPERTY PHP ------ */
 .form-header {
@@ -546,36 +597,53 @@ label {
     border-radius: 5px;
 }
 
+/* ------ PROPERTY APPROVAL PHP ------ */
+.btn-view-info {
+    background-color: #17a2b8;
+    color: white;
+    border-color: #17a2b8;
+}
+.btn-view-info:hover {
+    background-color: #138496; 
+    color: white;
+}
 
-/* ------ INDEX PHP ------ */
+
+
+/* ------ DASHBOARD PHP ------ */
 .banner {
     position: relative;
-    height: 315px; 
-    margin-bottom: 0;
-    padding-bottom: 0;
+    height: auto; 
+    max-height: 315px; 
+    margin-bottom: 30px; 
+    padding: 0; 
+    overflow: hidden;
+}
+.banner-content {
+    position: relative;
+    height: 315px; /* Adjust based on your preference */
 }
 
-.banner img {
-    height: 100%; 
+.banner-content img {
+    height: 100%;
     object-fit: cover;
-    opacity: 0.9; 
 }
-
 .banner-overlay {
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
+    color: white;
+    z-index: 2;
 }
-
-.banner h1 {
-    font-size: 35px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+.banner-overlay h1 {
+    font-size: 2.5rem; /* Adjust based on your design preference */
+    font-weight: bold;
+    margin-bottom: 0.5rem;
 }
-
-.banner p {
-    font-size: 20px;
-    margin-bottom: 0;
+.banner-overlay p {
+    font-size: 1rem; /* Adjust for readability */
 }
 
 @media (max-width: 768px) {
@@ -623,10 +691,9 @@ label {
 }
 
 
-
 /* ------ PROPERTY DETAILS PHP ------ */
 .property-header {
-    background-color: #17a2b8; /* Navy background */
+    background-color: #17a2b8; 
     color: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -669,6 +736,7 @@ label {
 }
 
 
+
 /* ------ JOIN WAITING LIST PHP ------ */
 .joinwaitinglist-body {
     background-color: #f8f9fa;
@@ -695,3 +763,25 @@ label {
 .joinwaitinglist-form-label {
     font-weight: 600;
 }
+
+
+/* ------ PENDING BOOKING CARD PHP ------ */
+.compact-text {
+    margin-bottom: 5px; 
+    line-height: 1.2; 
+}
+.red-bold {
+    color: red;
+    font-weight: bold;
+}
+.caption-text {
+    font-size: 16px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+    border-radius: 5px;
+    padding: 10px;
+    color: #6c757d; 
+    font-style: italic;
+    margin-top: 10px;
+}
+

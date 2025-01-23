@@ -1,81 +1,72 @@
 <?php
-include ("config.php");
-include ("NavBar.php");
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
-    $email = trim($_POST['email']);
-
-    // Check if email exists in the database
-    $stmt = $conn->prepare("SELECT security_question FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        $security_question = $user['security_question'];
-    } else {
-        $error = "No account found with that email.";
-    }
-
-    $stmt->close();
-}
+include("config.php");
+include("Navigation.php");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forget Password</title>
+    <title>Forgot Password</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-    <!-- Custom CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
     <div class="wrapper">
         <main class="content">
             <div class="reset-container">
-                <h2 class="text-center">Forgot Password</h2><br>
-             
-                <!-- Email Input -->
-                <?php if (!isset($security_question)): ?>
-                    <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Enter your email</label>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Submit</button>
-                    </form>
-                    <?php if (isset($error)): ?>
-                        <p class="text-danger text-center mt-3"><?php echo $error; ?></p>
-                    <?php endif; ?>
-                <?php else: ?>
-                
-                <!-- Security Question Display -->
-                <form method="POST" action="validate_security.php">
-                    <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
+                <h2>Forgot Password</h2><br>
+                <p>Please enter your email to get the reset link</p>
+
+                <form method="POST" action="send_password_reset.php">
                     <div class="mb-3">
-                        <label for="security_answer" class="form-label"><?php echo htmlspecialchars($security_question); ?></label>
-                        <input type="text" name="security_answer" id="security_answer" class="form-control" placeholder="Enter your answer" required>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email" autocomplete="email" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Submit Answer</button>
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
                 </form>
-                <?php endif; ?>
             </div>
         </main>
 
-        <!-- Footer Section-->
-        <?php include 'Footer.php'; ?>
+        <?php include 'Footer.php' ?>
     </div>
 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">
+                        <?php echo isset($_SESSION["modal_type"]) && $_SESSION["modal_type"] === "success" ? "Success" : "Error"; ?>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <?php echo isset($_SESSION["modal_message"]) ? $_SESSION["modal_message"] : ""; ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        <?php if (isset($_SESSION["modal_message"])): ?>
+            var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+            messageModal.show();
+            <?php 
+            // Clear session messages after displaying the modal
+            unset($_SESSION["modal_message"]);
+            unset($_SESSION["modal_type"]);
+            ?>
+        <?php endif; ?>
+    </script>
 </body>
-</html> 
+</html>

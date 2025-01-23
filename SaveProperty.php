@@ -3,17 +3,15 @@ include("config.php");
 include("Authenticate.php");
 include("Navigation.php");
 
-// Ensure user is logged in
 $userID = $_SESSION['UserID'];
 
-// Fetch the saved properties for the logged-in user
 $sql = "SELECT p.PropertyID, p.PropertyType, p.PropertyAddress, p.PropertyPrice, p.PropertyAmenities, p.Photo, p.Furnishing
         FROM saved_property sp
         JOIN property p ON sp.PropertyID = p.PropertyID
         WHERE sp.UserID = ?";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userID); // Bind the UserID parameter
+$stmt->bind_param("i", $userID); 
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
@@ -35,7 +33,6 @@ $result = $stmt->get_result();
 <body>
     <div class="wrapper">
         <main class="content">
-            <h4 class="mb-4 p-3">Your Saved Properties</h4>
             
             <?php if ($result->num_rows > 0): ?>
                 <div class="container mt-4">
@@ -49,9 +46,8 @@ $result = $stmt->get_result();
                         <?php
                         // Loop through each saved property
                         while ($row = $result->fetch_assoc()) {
-                            // Decode the photo JSON field for multiple photos
-                            $imageArray = json_decode($row['Photo'], true); // Decode JSON into an array
-                            $firstImage = isset($imageArray[0]) ? $imageArray[0] : 'uploads/'; // Use the first image or a default image
+                            $imageArray = json_decode($row['Photo'], true); 
+                            $firstImage = isset($imageArray[0]) ? $imageArray[0] : 'uploads/';
                         ?>
                         <div class="col-md-4 mb-4">
                             <div class="card property-card shadow-sm">
@@ -62,7 +58,6 @@ $result = $stmt->get_result();
                                     <p class="property-price">RM <?php echo number_format($row['PropertyPrice'], 2); ?></p>
                                     <p class="property-amenities">
                                         <?php
-                                        // Assuming PropertyAmenities is a comma-separated string, split it into individual amenities
                                         $amenities = explode(",", $row['PropertyAmenities']);
                                         foreach ($amenities as $amenity) {
                                             echo "<span class='amenity-item'><i class='bi bi-check-circle'></i> " . htmlspecialchars(trim($amenity)) . "</span>";
@@ -86,7 +81,7 @@ $result = $stmt->get_result();
                                     </div>
 
                                     <div class="property-actions">
-                                        <a href="PropertyDetails.php?id=<?php echo $row['PropertyID']; ?>" class="btn btn-primary">View Details</a>
+                                        <a href="PropertyDetails.php?id=<?php echo $row['PropertyID']; ?>" class="btn btn-primary">View Property</a>
                                         <a href="UnsaveProperty.php?id=<?php echo $row['PropertyID']; ?>" class="btn btn-danger">Unsave</a>
                                     </div>
                                 </div>
@@ -96,7 +91,7 @@ $result = $stmt->get_result();
                     </div>
                 </div>
             <?php else: ?>
-                <p>You have no saved properties.</p>
+                <p class="text-muted text-center mt-5">You have no save properties at the moment.</p>
             <?php endif; ?>
 
         </main>

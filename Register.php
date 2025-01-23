@@ -10,12 +10,11 @@ include("Navigation.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Account</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Register Form Section -->
     <div class="wrapper">
@@ -35,7 +34,7 @@ include("Navigation.php");
             <div class="tab-content" id="roleTabsContent">
                 <!-- Student Form -->
                 <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
-                    <form action="register_student.php" method="POST" enctype="multipart/form-data">
+                    <form action="Register_student.php" method="POST" enctype="multipart/form-data">
                         <!-- Full Name and Gender -->
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -81,12 +80,17 @@ include("Navigation.php");
                                 <label for="studentPhone" class="form-label">Phone Number*</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+60</span>
-                                    <input type="text" class="form-control" id="studentPhone" name="studentPhone" placeholder="Enter your phone number" required pattern="[0-9]{9,10}">
+                                    <input type="text" class="form-control" id="studentPhone" name="studentPhone" placeholder="Enter your phone number (12345678)" required pattern="[0-9]{9,10}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="studentPassword" class="form-label">Password*</label>
-                                <input type="password" class="form-control" id="studentPassword" name="studentPassword" placeholder="Enter your password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="studentPassword" name="studentPassword" placeholder="Enter your password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleStudentPassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -136,10 +140,9 @@ include("Navigation.php");
                     </form>
                 </div>
 
-
                 <!-- Homeowner Form -->
                 <div class="tab-pane fade" id="homeowner" role="tabpanel" aria-labelledby="homeowner-tab">
-                    <form action="register_homeowner.php" method="POST">
+                    <form action="Register_homeowner.php" method="POST">
                         <!-- Full Name and Gender -->
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -150,11 +153,11 @@ include("Navigation.php");
                                 <label class="form-label">Gender*</label>
                                 <div class="d-flex gap-5 align-items-center">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="genderMale" name="homeownerGender" value="male" required>
+                                        <input class="form-check-input" type="radio" id="genderMale" name="gender" value="male" required>
                                         <label class="form-check-label" for="genderMale">Male</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="genderFemale" name="homeownerGender" value="female" required>
+                                        <input class="form-check-input" type="radio" id="genderFemale" name="gender" value="female" required>
                                         <label class="form-check-label" for="genderFemale">Female</label>
                                     </div>
                                 </div>
@@ -171,16 +174,21 @@ include("Navigation.php");
                                 <label for="homeownerPhone" class="form-label">Phone Number*</label>
                                 <div class="input-group">
                                     <span class="input-group-text">+60</span>
-                                    <input type="text" class="form-control" id="homeownerPhone" name="homeownerPhone" placeholder="Enter your phone number" required pattern="[0-9]{9,10}">
+                                    <input type="text" class="form-control" id="homeownerPhone" name="homeownerPhone" placeholder="Enter your phone number (12345678)" required pattern="[0-9]{9,10}">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Password -->
                         <div class="row mb-3">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="homeownerPassword" class="form-label">Password*</label>
-                                <input type="password" class="form-control" id="homeownerPassword" name="homeownerPassword" placeholder="Enter your password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="homeownerPassword" name="homeownerPassword" placeholder="Enter your password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -222,7 +230,7 @@ include("Navigation.php");
                     </form>
                 </div>
 
-                 <!-- Success Modal -->
+                <!-- Success Modal -->
                 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -257,20 +265,58 @@ include("Navigation.php");
                         </div>
                     </div>
                 </div>
+
+                <?php
+                // Check if there's an error message stored in the session
+                if (isset($_SESSION['errorMessages'])) {
+                    $errorMessages = $_SESSION['errorMessages'];
+                    echo "
+                    <script type='text/javascript'>
+                        window.onload = function() {
+                            // Show the error modal
+                            $('#errorModal').modal('show');
+                            // Display the error messages
+                            document.getElementById('errorMessages').innerText = '" . addslashes($errorMessages) . "';
+                        }
+                    </script>";
+
+                    // Clear the session error message after displaying it
+                    unset($_SESSION['errorMessages']);
+                }
+                ?>
             </div>
         </main>
-
-        <!-- Footer Section -->
-        <footer class="bg-dark text-center text-white py-3 mt-auto">
-            <p class="mb-0">StudentRentalAccommodation.com</p>
-        </footer>
+        <?php include 'Footer.php'; ?>
     </div>
 
-    <!-- Bootstrap JavaScript (requires Popper.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-    
     <script src="script.js"></script>
+    <script>
+        document.getElementById("toggleStudentPassword").addEventListener("click", function () {
+            const passwordField = document.getElementById("studentPassword");
+            const passwordFieldType = passwordField.getAttribute("type");
+            if (passwordFieldType === "password") {
+                passwordField.setAttribute("type", "text");
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                passwordField.setAttribute("type", "password");
+                this.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
 
+
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordField = document.getElementById("homeownerPassword");
+            const passwordFieldType = passwordField.getAttribute("type");
+            if (passwordFieldType === "password") {
+                passwordField.setAttribute("type", "text");
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                passwordField.setAttribute("type", "password");
+                this.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+    </script>
 </body>
 </html>

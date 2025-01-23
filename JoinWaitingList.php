@@ -1,7 +1,7 @@
 <?php
-include("Auth.php");
 include("config.php");
-include("NavBar.php");
+include("Authenticate.php");
+include("Navigation.php");
 
 $waitingListID = isset($_GET['id']) ? intval($_GET['id']) : null;
 $userID = isset($_SESSION['UserID']) ? $_SESSION['UserID'] : null;

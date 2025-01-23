@@ -2,17 +2,15 @@
 session_start();
 include("config.php");
 
+// Ensure the user is authorized to update property (homeowner)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieve PropertyID from GET or POST
-    if (isset($_GET['id'])) {
-        $propertyID = $_GET['id'];
-    } elseif (isset($_POST['id'])) {
-        $propertyID = $_POST['id'];
-    } else {
+    $propertyID = $_GET['id'] ?? $_POST['id'] ?? null;
+    if (!$propertyID) {
         die("Error: PropertyID not found in the URL or POST data.");
     }
-    
-    // Retrieve existing property data
+
+    // Fetch existing property data
     $existingDataSql = "SELECT PropertyGrant, RentalAgreement, Photo FROM property WHERE PropertyID = ?";
     $stmt = $conn->prepare($existingDataSql);
     $stmt->bind_param("i", $propertyID);
@@ -29,35 +27,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $stmt->close();
 
-    // Validate and sanitize inputs
+    // Sanitize and assign POST values
     $propertyType = $_POST['propertyType'];
     $address = $_POST['address'];
-    $proximityToCollege = $_POST['proximityToCollege'];
-    $googleMapsLink = $_POST['googleMapsLink'];
+    $googleMapsUrl = $_POST['googleMapsLink'];
     $monthlyRent = $_POST['monthlyRent'];
     $totalTenants = $_POST['totalTenants'];
-    $monthlyRentPerPerson = ($totalTenants > 0) ? ($monthlyRent / $totalTenants) : 0; // Auto-calculate
+    $monthlyRentPerPerson = ($totalTenants > 0) ? ($monthlyRent / $totalTenants) : 0;
     $securityDeposit = $_POST['securityDeposit'];
     $leaseLength = $_POST['leaseLength'];
     $noOfBedrooms = $_POST['noOfBedrooms'];
     $noOfBathrooms = $_POST['noOfBathrooms'];
     $propertyDescription = $_POST['propertyDescription'];
     $furnishing = $_POST['furnishing'];
-    $amenities = isset($_POST['amenities']) ? implode(',', $_POST['amenities']) : ''; 
+    $amenities = isset($_POST['amenities']) ? implode(',', $_POST['amenities']) : '';
+    $bankNumber = htmlspecialchars(trim($_POST['bankNumber'])); 
+    $bankName = htmlspecialchars(trim($_POST['bankName'])); 
 
-    // Initialize photo array
+    // Initialize photo array and upload directory
     $photoArray = [];
-
-    // Handle file uploads for Photos, Property Grant, and Rental Agreement
     $uploadDir = "uploads/";
     $userID = $_SESSION['UserID'];
     $targetDir = $uploadDir . $userID . "/";
-
     if (!is_dir($targetDir)) {
         mkdir($targetDir, 0777, true);
     }
 
-    // Handle property photos
+    // Handle property photos upload
     if (isset($_FILES['propertyPhotos']) && $_FILES['propertyPhotos']['error'][0] == 0) {
         foreach ($_FILES['propertyPhotos']['name'] as $index => $fileName) {
             $fileTmpName = $_FILES['propertyPhotos']['tmp_name'][$index];
@@ -67,6 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $photoArray[] = str_replace("\\", "/", $targetFilePath);
             }
         }
+
+        // Merge newly uploaded photos with existing ones
         $existingPhotoArray = $existingPhotos ? json_decode($existingPhotos, true) : [];
         $photoArray = array_merge($existingPhotoArray, $photoArray);
     } else {
@@ -96,7 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $updateSql = "UPDATE property SET
                     PropertyType = ?, 
                     PropertyAddress = ?, 
-                    Proximity = ?, 
                     google_maps_url = ?, 
                     PropertyPrice = ?, 
                     MonthlyRentPerPerson = ?, 
@@ -107,20 +104,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     TotalTenants = ?, 
                     Description = ?, 
                     Furnishing = ?, 
-                    PropertyAmenities = ?, 
+                    PropertyAmenities = ?,
+                    bankNumber = ?,
+                    bankName = ?,  
                     Photo = ?, 
                     PropertyGrant = ?, 
                     RentalAgreement = ?, 
                     is_approved = CASE WHEN is_approved = -1 THEN 0 ELSE is_approved END
                     WHERE PropertyID = ?";
 
+    // Prepare statement for updating the property data
     $stmt = $conn->prepare($updateSql);
     $stmt->bind_param(
-        "ssdsiiiiiiissssssi", 
+        "sssiiiiiiissssssssi", 
         $propertyType, 
         $address, 
-        $proximityToCollege, 
-        $googleMapsLink, 
+        $googleMapsUrl, 
         $monthlyRent, 
         $monthlyRentPerPerson, 
         $securityDeposit, 
@@ -131,15 +130,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $propertyDescription, 
         $furnishing, 
         $amenities, 
+        $bankNumber,
+        $bankName,
         $updatedPhotos, 
         $propertyGrantPath, 
         $rentalAgreementPath, 
         $propertyID
     );
 
+    // Execute the update query and handle success or failure
     if ($stmt->execute()) {
-        // Log activity
-        $userID = $_SESSION['UserID'];
+        // Log activity for the update
         $userSql = "SELECT name FROM users WHERE UserID = ?";
         $userStmt = $conn->prepare($userSql);
         $userStmt->bind_param("i", $userID);
@@ -147,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $userResult = $userStmt->get_result();
         $userName = $userResult->fetch_assoc()['name'] ?? "Unknown User";
 
+        // Log the activity to the database
         $activityDescription = "The user $userName has updated property ID $propertyID.";
         $activitySql = "INSERT INTO activities (UserID, action, created_at) VALUES (?, ?, NOW())";
         $activityStmt = $conn->prepare($activitySql);
@@ -158,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['error_message'] = "Error updating property: " . $stmt->error;
     }
 
+    // Redirect back to the property edit page
     header("Location: EditProperty.php?id=" . $propertyID);
     exit();
 }

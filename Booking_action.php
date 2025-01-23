@@ -1,6 +1,6 @@
 <?php
 include("config.php");
-include("Auth.php");
+include("Authenticate.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $propertyID = intval($_POST['propertyID']);
@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numPeople = ($bookingType === "group") ? (isset($_POST['numPeople']) ? intval($_POST['numPeople']) : 0) : 1; // Default to 1 for "Myself"
     $moveInDate = $_POST['moveInDate'];
     $moveOutDate = $_POST['moveOutDate'];
-    $monthlyRent = floatval($_POST['MonthlyRent']);
     $currentDateTime = date('Y-m-d H:i:s');
 
     // Fetch property details
@@ -26,6 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $totalTenantsRequired = $property['TotalTenants'];
+
+    // Enforce that only "myself" is allowed if TotalTenants = 1
+    if ($totalTenantsRequired === 1 && $bookingType !== 'myself') {
+        echo "Error: You can only book for yourself as the property requires 1 tenant.";
+        exit;
+    }
+
     $propertyAddress = htmlspecialchars($property['PropertyAddress']);
     $monthlyRent = floatval($property['PropertyPrice']); // Monthly rent from property table
     $ownerID = $property['UserID']; // Fetch the property owner's UserID
@@ -60,8 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $notificationMessage = "You have successfully joined the waiting list for the property located at " . $propertyAddress . ".";
         $notificationType = "Join Waiting List";
 
-        $notificationQuery = "INSERT INTO notification (UserID, SenderID, NotificationType, NotificationMessage, Date) 
-                            VALUES (?, ?, ?, ?, ?)";
+        $notificationQuery = "INSERT INTO notification (UserID, SenderID, NotificationType, NotificationMessage, Date) VALUES (?, ?, ?, ?, ?)";
         $notificationStmt = $conn->prepare($notificationQuery);
         $notificationStmt->bind_param("iisss", $userID, $userID, $notificationType, $notificationMessage, $currentDateTime);
         $notificationStmt->execute();
@@ -71,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif ($numPeople == $totalTenantsRequired) {
         // Send notification to user
-        $notificationMessage = "Your booking for the property located at " . $propertyAddress . " has been confirmed.";
-        $notificationType = "Booking Agreement";
+        $notificationMessage = "Your booking for the property located at " . $propertyAddress . " has been confirmed. Please wait for approval from the property owner.";
+        $notificationType = "Booking Approval";
 
         $notificationQuery = "INSERT INTO notification (UserID, SenderID, NotificationType, NotificationMessage, Date) 
                             VALUES (?, ?, ?, ?, ?)";
@@ -81,24 +86,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $notificationStmt->execute();
 
         // Insert booking details
-        $bookingQuery = "INSERT INTO booking (PropertyID, UserID, BookingType, NumOfPeople, MoveInDate, MoveOutDate, MonthlyRent, TotalRent) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $bookingQuery = "INSERT INTO booking (PropertyID, UserID, BookingType, NumOfPeople, MoveInDate, MoveOutDate) 
+                         VALUES (?, ?, ?, ?, ?, ?)";
         $bookingStmt = $conn->prepare($bookingQuery);
         $bookingStmt->bind_param(
-            "iisiissi", 
+            "iisiss", 
             $propertyID, 
             $userID, 
             $bookingType, 
             $numPeople, 
             $moveInDate, 
-            $moveOutDate, 
-            $monthlyRent, 
-            $totalRent
+            $moveOutDate,
         );
         $bookingStmt->execute();
 
+        // Handle group member details if "group" booking type is selected
+        if ($bookingType === "group" && isset($_POST['memberName']) && isset($_POST['memberPhone']) && isset($_POST['memberIC'])) {
+            $memberNames = $_POST['memberName'];
+            $memberPhones = $_POST['memberPhone'];
+            $memberICs = $_POST['memberIC'];
+
+            foreach ($memberNames as $key => $name) {
+                $phone = $memberPhones[$key];
+                $ic = $memberICs[$key];
+
+                $groupMemberQuery = "INSERT INTO group_members (BookingID, Name, Phone, IC) VALUES (?, ?, ?, ?)";
+                $groupMemberStmt = $conn->prepare($groupMemberQuery);
+                $groupMemberStmt->bind_param("isss", $bookingStmt->insert_id, $name, $phone, $ic);
+                $groupMemberStmt->execute();
+            }
+        }
+
         // Send notification to the property owner
-        $ownerNotificationMessage = "Your property located at " . $propertyAddress . " has been fully booked. Please confirm the booking";
+        $ownerNotificationMessage = "Your property located at " . $propertyAddress . " has been fully booked. Please confirm the booking as soon as possible.";
         $ownerNotificationType = "Booking Confirmation";
 
         $ownerNotificationQuery = "INSERT INTO notification (UserID, SenderID, NotificationType, NotificationMessage, Date) 
@@ -107,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ownerNotificationStmt->bind_param("iisss", $ownerID, $userID, $ownerNotificationType, $ownerNotificationMessage, $currentDateTime);
         $ownerNotificationStmt->execute();
 
-        echo "You have successfully filled in the booking form. Your booking is confirmed.";
+        echo "You have successfully filled in the booking form. The booking is still in pending status. <br> Please wait for property owner to confirm it. <br>
+        You can view your booking by clicking Pending Booking at your profile.";
         exit;
     }
 }

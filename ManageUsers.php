@@ -1,6 +1,6 @@
 <?php
-include("Authenticate.php");
 include("config.php");
+include("Authenticate.php");
 include("Navigation.php");
 ?>
 
@@ -11,10 +11,8 @@ include("Navigation.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Dashboard</title>
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -22,14 +20,14 @@ include("Navigation.php");
     <div class="wrapper">
         <main class="content">
             <div class="container mt-5">
-                <!-- Page Title -->
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h3">Manage Users</h1>
-                    <button class="btn btn-primary" onclick="toggleAdminForm()">Add New Admin</button>
+                    <!--<button class="btn btn-primary" onclick="toggleAdminForm()">Add New Admin</button>-->
                 </div>
 
-                <!-- Admin Form (Hidden)-->
-                <div id="addAdminForm" class="card p-3 mb-4" style="display: none; background-color: white; border: 1px solid #ddd; border-radius: 8px;">
+                <!-- Admin Form 
+                <div id="addAdminForm" class="card p-3 mb-4" style="display: none;">
                     <h5 class="mb-4 fw-bold">Add New Admin</h5>
                     <form action="AddAdmin.php" method="POST">
                         <div class="row g-2">
@@ -45,7 +43,12 @@ include("Navigation.php");
                                 <input type="text" class="form-control" id="adminPhone" name="adminPhone" placeholder="Phone Number" required>
                             </div>
                             <div class="col-md-6">
-                                <input type="password" class="form-control" id="adminPassword" name="adminPassword" placeholder="Password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="adminPassword" name="adminPassword" placeholder="Password" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mt-3">
@@ -53,7 +56,7 @@ include("Navigation.php");
                             <button type="button" class="btn btn-secondary" onclick="toggleAdminForm()">Cancel</button>
                         </div>
                     </form>
-                </div>
+                </div>-->
 
                 <!-- Search Bar -->
                 <div class="d-flex justify-content-end mb-4">
@@ -82,11 +85,10 @@ include("Navigation.php");
                             $searchQuery = '';
                             $users = [];
 
-                            // Check if a search query was submitted
                             if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
                                 $searchQuery = trim($_GET['search']);
 
-                                // Query to search users by name or email
+                                //search users by name or email
                                 $sql = "SELECT UserID, name, email, role, user_type, is_active 
                                         FROM users 
                                         WHERE (name LIKE ? OR email LIKE ?) AND role != 'super_admin'";
@@ -98,8 +100,6 @@ include("Navigation.php");
                                     $stmt->bind_param("ss", $likeSearch, $likeSearch);
                                     $stmt->execute();
                                     $result = $stmt->get_result();
-
-                                    // Fetch users into an array
                                     while ($row = $result->fetch_assoc()) {
                                         $users[] = $row;
                                     }
@@ -108,9 +108,7 @@ include("Navigation.php");
                                     echo "<tr><td colspan='6' class='text-center'>Error: " . $conn->error . "</td></tr>";
                                 }
                             } else {
-                                $sql = "SELECT UserID, name, email, role, user_type, is_active 
-                                        FROM users 
-                                        WHERE role != 'super_admin'";
+                                $sql = "SELECT UserID, name, email, role, user_type, is_active FROM users WHERE role != 'super_admin'";
                                 $result = $conn->query($sql);
 
                                 if ($result) {
@@ -131,35 +129,66 @@ include("Navigation.php");
                                     echo "<td>" . htmlspecialchars($user['email']) . "</td>";
                                     echo "<td>" . ucfirst($user['role']) . "</td>";
                                     echo "<td>" . htmlspecialchars($user['user_type']) . "</td>"; 
-                                    echo "<td>
-                                            <span class='badge " . ($user['is_active'] ? 'bg-success' : 'bg-danger') . "'>" .
-                                            ($user['is_active'] ? 'Active' : 'Inactive') . "</span>
-                                        </td>";
-                                    echo "<td>
-                                            <button class='btn btn-sm btn-danger' onclick='deleteUser(" . $user['UserID'] . ")'>Delete</button>
-                                        </td>";
+                                    echo "<td>" . ($user['is_active'] ? 'Active' : 'Inactive') . "</td>";
+                                    echo "<td><button class='btn btn-sm btn-danger' onclick='deleteUser(" . htmlspecialchars($user['UserID']) . ")'>Delete</button></td>";
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='6' class='text-center'>No users found.</td></tr>";
+                                echo "<tr><td colspan='7' class='text-center'>No users found.</td></tr>";
                             }
-
                             $conn->close();
                             ?>
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </main>
-
-        <!-- Footer Section -->
         <?php include 'Footer.php'; ?>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+    <script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordField = document.getElementById("adminPassword");
+        const passwordFieldType = passwordField.getAttribute("type");
+        if (passwordFieldType === "password") {
+            passwordField.setAttribute("type", "text");
+            this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            passwordField.setAttribute("type", "password");
+            this.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    });
 
+    function deleteUser(userID) {
+        if (!userID) {
+            alert("Error: User ID is undefined.");
+            return;
+        }
+        if (confirm("Are you sure you want to delete this user?")) {
+            fetch("Delete_user.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ UserID: userID }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); // Reload the page after deletion
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("An error occurred while deleting the user.");
+                });
+        }
+    }
+    </script>
 </body>
 </html>

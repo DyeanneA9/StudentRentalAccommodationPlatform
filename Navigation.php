@@ -3,7 +3,7 @@ require_once("Session.php");
 require_once("config.php");
 
 // Only include Authenticate.php for non-public pages
-$publicPages = ['Login.php', 'Register.php'];
+$publicPages = ['Login.php', 'Register.php', 'Forgot_password.php', 'send_password_reset.php', 'reset_password.php'];
 if (!in_array(basename($_SERVER['PHP_SELF']), $publicPages)) {
     require_once("Authenticate.php");
 }
@@ -64,7 +64,14 @@ if (isset($_SESSION['UserID'])) {
                         // Logged-in student
                         echo '<li class="nav-item"><a class="nav-link" href="Dashboard.php">Home</a></li>';
                         echo '<li class="nav-item"><a class="nav-link" href="SaveProperty.php">Saved Properties</a></li>';
-                        echo '<li class="nav-item"><a class="nav-link" href="Notification.php">Notifications</a></li>';
+                        echo '<li class="nav-item">
+                                <a class="nav-link" href="Notification.php">
+                                    Notifications
+                                    <span class="badge badge-danger" id="notificationBadge">
+                                        ' . htmlspecialchars($unreadCount ?? 0) . '
+                                    </span>
+                                </a>
+                            </li>';
                         echo '<li class="nav-item"><a class="nav-link" href="Logout.php">Logout</a></li>';
                         echo '<li class="nav-item">
                                 <a href="StudentProfile.php">
@@ -77,7 +84,14 @@ if (isset($_SESSION['UserID'])) {
                         // Logged-in homeowner
                         echo '<li class="nav-item"><a class="nav-link" href="Dashboard.php">Home</a></li>';
                         echo '<li class="nav-item"><a class="nav-link" href="AddProperty.php">Add Property</a></li>';
-                        echo '<li class="nav-item"><a class="nav-link" href="Notification.php">Notifications</a></li>';
+                        echo '<li class="nav-item">
+                                <a class="nav-link" href="Notification.php">
+                                    Notifications
+                                    <span class="badge badge-danger" id="notificationBadge">
+                                        ' . htmlspecialchars($unreadCount ?? 0) . '
+                                    </span>
+                                </a>
+                            </li>';
                         echo '<li class="nav-item"><a class="nav-link" href="Logout.php">Logout</a></li>';
                         echo '<li class="nav-item">
                                 <a href="HomeownerProfile.php">
@@ -100,5 +114,40 @@ if (isset($_SESSION['UserID'])) {
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        //Notification Badge Update
+        function updateNotificationBadge() {
+            fetch('GetUnreadCount.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const badge = document.getElementById('notificationBadge');
+                    if (!badge) {
+                        console.error('Notification badge element not found.');
+                        return;
+                    }
+
+                    if (data.unreadCount !== undefined) {
+                        badge.textContent = data.unreadCount;
+                        badge.style.display = data.unreadCount > 0 ? 'inline' : 'none';
+                    } else {
+                        console.error('Unread count is undefined in the response:', data);
+                    }
+                })
+                .catch(error => console.error('Error updating notification badge:', error));
+        }
+
+        // Run updateNotificationBadge periodically, except on the Notification page
+        if (!window.location.href.includes('Notification.php')) {
+            setInterval(updateNotificationBadge, 10000); // Update every 10 seconds
+        }
+
+        // Always run badge update on page load
+        document.addEventListener('DOMContentLoaded', updateNotificationBadge);
+    </script>
 </body>
 </html>

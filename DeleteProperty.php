@@ -2,10 +2,8 @@
 session_start();
 include("config.php");
 
-$userType = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : null;
-
-if ($userType !== 'homeowner') {
-    // Redirect if not a homeowner
+// Ensure the user is a homeowner
+if ($_SESSION['user_type'] !== 'homeowner') {
     header("Location: Login.php");
     exit();
 }
@@ -14,20 +12,18 @@ if ($userType !== 'homeowner') {
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $propertyID = $_GET['id'];
 
-    // Prepare SQL statement to delete the property
+    // Delete the property
     $sql = "DELETE FROM property WHERE PropertyID = ?";
 
-    // Prepare and bind
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("i", $propertyID); // "i" for integer
+        $stmt->bind_param("i", $propertyID); 
         
-        // Execute the query
+        // Execute the deletion
         if ($stmt->execute()) {
-            // Redirect back to the property listing page after successful deletion
+            // Redirect to the profile page with success message
             header("Location: HomeownerProfile.php?message=Property+deleted+successfully");
             exit();
         } else {
-            // Handle failure
             echo "Error deleting property: " . $conn->error;
         }
 
@@ -36,7 +32,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         echo "Error preparing query: " . $conn->error;
     }
 } else {
-    // If no property ID is provided, redirect to the property listing page
+    // If no property ID is provided, redirect to the profile page with an error message
     header("Location: HomeownerProfile.php?error=No+property+ID+provided");
     exit();
 }
