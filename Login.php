@@ -1,10 +1,10 @@
 <?php
 require_once("Navigation.php");
 
-// Check for error query parameter and prepare error message
 $error_message = 'An unknown error occurred.';
 
 if (isset($_GET['error'])) {
+    // Set error message based on error type
     switch ($_GET['error']) {
         case 'invalid_role':
             $error_message = 'Invalid user role. Please contact the administrator.';
@@ -19,10 +19,10 @@ if (isset($_GET['error'])) {
             $error_message = 'Incorrect email or password. Please try again.';
             break;
         case 'account_does_not_exist':
-            $error_message = 'Account does not exist. Please check your email.';
+            $error_message = 'Account does not exist. Please check your email or register.';
             break;
         case 'account_not_approved':
-            $error_message = 'Your account has not been approved by the admin. Please wait.';
+            $error_message = 'Your account has not been approved by the admin. Please try again later.';
             break;
         case 'empty_fields':
             $error_message = 'Please fill in all the fields.';
@@ -31,13 +31,20 @@ if (isset($_GET['error'])) {
             $error_message = 'An unknown error occurred. Please try again.';
             break;
     }
-    echo "<script>
+    
+    // Display error modal
+    echo "
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const errorModal = new bootstrap.Modal('#errorModal', {
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'), {
                 backdrop: 'static', // Ensures modal cannot be dismissed by clicking outside
                 keyboard: false // Disables closing modal with the Esc key
             });
             errorModal.show();
+
+            // Handle close button functionality
+            document.querySelector('.btn-close').addEventListener('click', () => errorModal.hide());
+            document.querySelector('.btn-secondary').addEventListener('click', () => errorModal.hide());
         });
     </script>";
 }
@@ -49,11 +56,11 @@ if (isset($_GET['error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="css/style.css"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -64,16 +71,25 @@ if (isset($_GET['error'])) {
                 <p>Welcome back! Please login to your account</p>
                 
                 <form action="Login_action.php" method="POST" autocomplete="on">
+                    <!-- Email input -->
                     <input type="email" name="email" class="form-control" placeholder="Enter your email" autocomplete="email" required>
-                    <div class="position-relative">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required>
-                        <button type="button" class="btn position-absolute end-0 top-0 mt-2 me-2" id="togglePassword" onclick="togglePasswordVisibility()">
-                            <i class="bi bi-eye" id="passwordIcon"></i>
-                        </button>
+
+                    <!-- Password input with toggle visibility -->
+                    <div class="col-md-14">
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- Forgot password link -->
                     <div class="d-flex justify-content-end">
                         <a href="Forgot_password.php" class="forgot-password">Forgot Password?</a>
                     </div>
+
+                    <!-- Submit button -->
                     <button type="submit" class="btn btn-primary w-100">Continue</button>
                 </form>
             </div>
@@ -96,13 +112,23 @@ if (isset($_GET['error'])) {
                 </div>
             </div>
         </div>
-
-        <!-- Footer Section -->
         <?php include 'Footer.php'; ?>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordField = document.getElementById("password");
+            const passwordFieldType = passwordField.getAttribute("type");
+            if (passwordFieldType === "password") {
+                passwordField.setAttribute("type", "text");
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                passwordField.setAttribute("type", "password");
+                this.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+    </script>
 </body>
 </html>

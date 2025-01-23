@@ -13,58 +13,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt) {
             $stmt->bind_param("s", $email);
             $stmt->execute();
-            $result = $stmt->get_result();
+            $stmt->store_result();
 
-            if ($result && $result->num_rows == 1) {
-                $row = $result->fetch_assoc();
+            if ($stmt->num_rows > 0) {
+                // User exists, fetch data and verify password
+                $stmt->bind_result($UserID, $db_email, $db_password, $role, $user_type, $is_approved);
+                $stmt->fetch();
 
                 // Check if account is approved
-                if ($row['is_approved'] == 0) {
-                    // Account is not approved
+                if ($is_approved != 1) {
+                    // Account not approved, redirect
                     header("Location: Login.php?error=account_not_approved");
                     exit();
                 }
 
-                if (password_verify($password, $row['password'])) {
+                // Verify password
+                if (password_verify($password, $db_password)) {
                     // Regenerate session ID to prevent fixation
                     session_regenerate_id(true);
 
                     // Store user data in session
-                    $_SESSION['UserID'] = $row['UserID'];
-                    $_SESSION['role'] = $row['role'];
-                    $_SESSION['email'] = $row['email'];
-                    $_SESSION['user_type'] = $row['user_type'];
+                    $_SESSION['UserID'] = $UserID;
+                    $_SESSION['role'] = $role;
+                    $_SESSION['email'] = $db_email;
+                    $_SESSION['user_type'] = $user_type;
 
                     // Role-based redirection
-                    if ($row['role'] === 'user') {
+                    if ($role === 'user') {
                         header("Location: Dashboard.php");
-                    } elseif ($row['role'] === 'admin') {
+                    } elseif ($role === 'admin') {
                         header("Location: AdminDashboard.php");
-                    } elseif ($row['role'] === 'super_admin') {
+                    } elseif ($role === 'super_admin') {
                         header("Location: SuperAdminDashboard.php");
                     } else {
                         header("Location: Login.php?error=invalid_role");
                     }
                     exit();
-                    
                 } else {
-                    // Redirect back to login with error for incorrect password
+                    // Incorrect password, redirect back with error
                     header("Location: Login.php?error=incorrect_credentials");
                     exit();
                 }
             } else {
-                // Redirect back to login if user is not found
-                header("Location: Login.php?error=user_not_found");
+                // User not found, redirect with specific error
+                header("Location: Login.php?error=account_does_not_exist");
                 exit();
             }
+
             $stmt->close();
         } else {
-            // Handle database connection errors
+            // Database connection error, redirect with error
             header("Location: Login.php?error=database_error");
             exit();
         }
     } else {
-        // Redirect to login if fields are empty
+        // Fields are empty, redirect with error
         header("Location: Login.php?error=empty_fields");
         exit();
     }
